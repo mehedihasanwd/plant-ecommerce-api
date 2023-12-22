@@ -1,8 +1,23 @@
+import mongoose from "mongoose";
 import * as common_type from "./common_type";
 import * as payload_type from "./payload_type";
 
+interface ICreateRefreshTokenParam {
+  payload: {
+    _id: string | mongoose.Schema.Types.ObjectId;
+  };
+
+  secretKey: string;
+
+  expiresIn: string;
+}
+
 interface ICreateRefreshToken {
-  createRefreshToken({ _id }: common_type.IObjectIdOrString): Promise<string>;
+  createRefreshToken({
+    payload,
+    secretKey,
+    expiresIn,
+  }: ICreateRefreshTokenParam): Promise<string>;
 }
 
 interface ICreateStaffAccessToken {
