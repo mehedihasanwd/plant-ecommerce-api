@@ -1,8 +1,12 @@
 import * as common_type from "./common_type";
 import * as payload_type from "./payload_type";
 
-interface ICreateStaffAuthToken {
-  createAuthOToken({
+interface ICreateRefreshToken {
+  createRefreshToken({ _id }: common_type.IObjectIdOrString): Promise<string>;
+}
+
+interface ICreateStaffAccessToken {
+  createAccessToken({
     payload,
     secretKey,
     expiresIn,
@@ -13,8 +17,8 @@ interface ICreateStaffAuthToken {
   }): Promise<string>;
 }
 
-interface ICreateUserAuthToken {
-  createAuthOToken({
+interface ICreateUserAccessToken {
+  createAccessToken({
     payload,
     secretKey,
     expiresIn,
@@ -30,7 +34,11 @@ interface IComparePassword {
 }
 
 export interface IStaffMethods
-  extends ICreateStaffAuthToken,
+  extends ICreateRefreshToken,
+    ICreateStaffAccessToken,
     IComparePassword {}
 
-export interface IUserMethods extends ICreateUserAuthToken, IComparePassword {}
+export interface IUserMethods
+  extends ICreateRefreshToken,
+    ICreateUserAccessToken,
+    IComparePassword {}
