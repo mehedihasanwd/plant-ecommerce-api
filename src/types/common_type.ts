@@ -34,19 +34,21 @@ export interface IUrl {
   url: string;
 }
 
-export interface IChangedSelf {
-  changedSelf: boolean;
+export interface IsChangedSelf {
+  isChangedSelf: boolean;
 }
 
 export interface ImageProps extends IKey, IUrl {}
 
-export interface IProfileImageProps extends IKey, IUrl, IChangedSelf {}
+export interface IProfileImageProps extends IKey, IUrl, IsChangedSelf {}
 
 export interface IImage {
   image: ImageProps;
 }
 
-export interface IProfileImage extends IProfileImageProps {}
+export interface IProfileImage {
+  image: IProfileImageProps;
+}
 
 export interface IName {
   name: string;
