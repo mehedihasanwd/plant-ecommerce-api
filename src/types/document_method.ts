@@ -4,7 +4,7 @@ import * as payload_type from "./payload_type";
 
 interface ICreateRefreshTokenParam {
   payload: {
-    _id: string | mongoose.Schema.Types.ObjectId;
+    _id: mongoose.Types.ObjectId;
   };
 
   secretKey: string;
