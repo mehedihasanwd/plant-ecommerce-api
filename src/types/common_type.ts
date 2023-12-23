@@ -17,6 +17,13 @@ export type TTopcategory =
   | "Highestrated"
   | "Regular";
 
+export interface IEmailBody {
+  from: string;
+  to: string;
+  subject: string;
+  html: string;
+}
+
 // prop interfaces
 export interface IObjectIdOrString {
   _id: string | mongoose.Types.ObjectId;
