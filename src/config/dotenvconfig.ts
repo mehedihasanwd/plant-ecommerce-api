@@ -21,6 +21,7 @@ export default {
   SUPER_ADMIN: process.env.SUPER_ADMIN as string,
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
   SITE_URL: process.env.SITE_URL as string,
+  DASHBOARD_URL: process.env.DASHBOARD_URL as string,
   REDIS_HOST: process.env.REDIS_HOST as string,
   REDIS_PORT: Number(process.env.REDIS_PORT || "6379"),
   REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
