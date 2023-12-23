@@ -9,7 +9,7 @@ import * as review from "./review";
 export default {
   "/health": getHealth,
 
-  "/auth/staffs/verify-email": staff.post_verify_new_staff_email,
+  "/auth/staffs/verify-email": staff.post_verify_email,
 
   "/auth/staffs/register": staff.post_register_staff,
 
@@ -33,7 +33,7 @@ export default {
 
   "/staffs/s/{staffId}": staff.staff_by_id,
 
-  "/auth/users/verify-email": user.post_verify_new_user_email,
+  "/auth/users/verify-email": user.post_verify_email,
 
   "/auth/users/register": user.post_register_user,
 
