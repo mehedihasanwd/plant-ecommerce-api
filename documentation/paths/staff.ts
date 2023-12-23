@@ -19,7 +19,7 @@ const staff_param_id = {
 };
 
 // path schemas
-export const post_verify_new_staff_email = {
+export const post_verify_email = {
   post: {
     [props.description]: "Verify email",
     [props.tags]: [tags.staff_auth],
