@@ -23,7 +23,7 @@ export interface IObjectIdOrString {
 }
 
 export interface IObjectId {
-  _id: mongoose.Schema.Types.ObjectId;
+  _id: mongoose.Types.ObjectId;
 }
 
 export interface IKey {
