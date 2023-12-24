@@ -75,8 +75,8 @@ const staff_schema = new mongoose.Schema<
 
       default: {
         isChangedSelf: false,
-        key: "profile_avatar.png",
-        url: `${dotenvconfig.AMAZON_S3_CLOUDFRONT_DOMAIN_NAME}/profile_avatar.png`,
+        key: dotenvconfig.DEFAULT_PROFILE_IMAGE_KEY,
+        url: dotenvconfig.DEFAULT_PROFILE_IMAGE_URL,
       },
     },
 
