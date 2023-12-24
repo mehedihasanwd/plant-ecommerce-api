@@ -54,7 +54,7 @@ export const uploadImageToS3 = async ({
   }
 };
 
-export const cloudfrontImageUrl = async ({
+export const cloudfrontImageUrl = ({
   cloud_image,
 }: {
   cloud_image: TS3ManagedUpload;
