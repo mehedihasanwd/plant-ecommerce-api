@@ -58,7 +58,7 @@ export const update_staff_email_validate_schema: joi.ObjectSchema<staff_type.IPa
     token: common_validator_schema.token_schema,
   });
 
-export const update_staff_role_validate_schema: joi.ObjectSchema<staff_type.IPatchStaffEmail> =
+export const update_staff_role_validate_schema: joi.ObjectSchema<staff_type.IPatchStaffRole> =
   joi.object({
     role: role_schema,
   });
