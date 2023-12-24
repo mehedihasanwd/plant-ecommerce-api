@@ -63,7 +63,9 @@ interface IClearKeysParam {
   key: "staffs" | "users" | "categories" | "products" | "orders" | "reviews";
 }
 
-export const clearKeys = async ({ key }: IClearKeysParam) => {
+export const clearKeys = async ({
+  key,
+}: IClearKeysParam): Promise<number | ""> => {
   const keys: Array<string> | null = await getCacheKeys();
   const matched_keys: Array<string> | null = keys
     ? keys.filter((item: string) => item.match(key))
