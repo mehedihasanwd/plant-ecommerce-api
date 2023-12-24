@@ -304,3 +304,51 @@ export const postForgotPassword: RequestHandler = async (req, res, next) => {
     return next(e);
   }
 };
+
+export const postVerifyStaffEmail: RequestHandler = async (req, res, next) => {
+  const { value, error } =
+    staff_validator.verify_staff_email_validate_schema.validate({
+      email: req.body?.email,
+      new_email: req.body?.new_email,
+    });
+
+  if (error) {
+    return response.responseErrorMessages(res, 400, {
+      errors: errorReducer(error.details),
+    });
+  }
+
+  try {
+    const staff: staff_type.THydratedStaffDocument | null =
+      await staff_service.findStaffByProp({ key: "email", value: value.email });
+
+    if (!staff) {
+      return response.responseErrorMessage(res, 404, {
+        error: "Account not found!",
+      });
+    }
+
+    const access_token: string = token.updateAccountEmailToken({
+      payload: {
+        email: value.email,
+        new_email: value.new_email,
+      },
+      secretKey: dotenvconfig.JWT_ACCESS,
+      expiresIn: "15m",
+    });
+
+    const email_body: common_type.IEmailBody =
+      email_template.updateAccountEmailTemplate({
+        receiver_email: value.email,
+        receiver_name: staff.name,
+        access_token,
+        account: "staff",
+      });
+
+    const message: string = `Email has been sent to ${value.email}, please check your email and follow the instructions to update your email`;
+
+    return mailer.sendEmail(res, email_body, message);
+  } catch (e) {
+    return next(e);
+  }
+};
