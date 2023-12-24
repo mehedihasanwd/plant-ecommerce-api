@@ -53,12 +53,12 @@ export const verify_staff_email_validate_schema: joi.ObjectSchema<staff_type.IPo
     new_email: common_validator_schema.new_email_schema,
   });
 
-export const update_staff_email_validate_schema: joi.ObjectSchema<staff_type.IUpdateStaffEmail> =
+export const update_staff_email_validate_schema: joi.ObjectSchema<staff_type.IPatchStaffEmail> =
   joi.object({
     token: common_validator_schema.token_schema,
   });
 
-export const update_staff_role_validate_schema: joi.ObjectSchema<staff_type.IUpdateStaffRoleById> =
+export const update_staff_role_validate_schema: joi.ObjectSchema<staff_type.IPatchStaffEmail> =
   joi.object({
     role: role_schema,
   });
