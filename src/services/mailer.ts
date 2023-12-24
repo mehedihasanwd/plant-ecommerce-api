@@ -45,8 +45,7 @@ export const sendEmail = (
 
 export const sendEmailToSuperAdmin = (
   res: express.Response,
-  body: common_type.IEmailBody,
-  message: string
+  body: common_type.IEmailBody
 ) => {
   transporter.verify((err: Error | null) => {
     if (err) {
