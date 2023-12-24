@@ -7,6 +7,7 @@ import {
   errorReducer,
   document_extractor,
   create_cache_key,
+  isValidParamId,
 } from "../../utils";
 import { common_type, staff_type } from "../../types";
 import dotenvconfig from "../../config/dotenvconfig";
@@ -268,6 +269,82 @@ export const patchUpdateStaffEmail: RequestHandler = async (req, res, next) => {
         });
       }
     );
+  } catch (e) {
+    return next(e);
+  }
+};
+
+export const patchUpdateStaffRoleById: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  const _id = req.params?.staffId;
+
+  const { value, error } =
+    staff_validator.update_staff_role_validate_schema.validate({
+      role: req.body?.role,
+    });
+
+  if (!isValidParamId(_id)) {
+    return response.responseErrorMessage(res, 401, {
+      error: "Invalid staff id! please try again using a valid one",
+    });
+  }
+
+  if (error) {
+    return response.responseErrorMessage(res, 400, {
+      error: error.details[0].message,
+    });
+  }
+
+  try {
+    const staff: staff_type.THydratedStaffDocument | null =
+      await staff_service.findStaffByProp({ key: "_id", value: _id });
+
+    if (!staff) {
+      return response.responseErrorMessage(res, 404, {
+        error: "Staff not found!",
+      });
+    }
+
+    const updated_staff: staff_type.THydratedStaffDocument | null =
+      await staff_service.updateStaffRoleById({ _id, role: value.role });
+
+    if (!updated_staff) {
+      return response.responseErrorMessage(res, 500, {
+        error: "Server error occurred! please try again",
+      });
+    }
+
+    const { data_except_password } = document_extractor.extractStaffDocument({
+      staff: updated_staff,
+    });
+
+    // clear staffs from cache
+    await redis_service.clearKeys({ key: "staffs" });
+
+    // save staff in cache (3600 * 24 * 2 - for 2 days)
+    const cache_key: string = create_cache_key.createKeyForDocument({
+      key: "staff",
+      value: data_except_password._id.toString(),
+    });
+
+    await redis_service.saveToCache({
+      key: cache_key,
+      document: data_except_password,
+      EX: 3600 * 25 * 2,
+    });
+
+    return response.responseSuccessData(res, 200, {
+      code: 200,
+      message: "Role updated successfully",
+      staff: data_except_password,
+      links: {
+        self: `/staffs/s/${_id}`,
+        staffs: "/dashboard/staffs",
+      },
+    });
   } catch (e) {
     return next(e);
   }
