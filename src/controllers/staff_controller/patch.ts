@@ -114,3 +114,71 @@ export const patchResetStaffPassword: RequestHandler = async (
     return next(e);
   }
 };
+
+export const patchChangeStaffPassword: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  const { value, error } =
+    staff_validator.change_password_validate_schema.validate({
+      email: req.body?.email,
+      password: req.body?.password,
+      new_password: req.body?.new_password,
+    });
+
+  if (error) {
+    return response.responseErrorMessages(res, 400, {
+      errors: errorReducer(error.details),
+    });
+  }
+
+  try {
+    const staff: staff_type.THydratedStaffDocument | null =
+      await staff_service.findStaffByProp({ key: "email", value: value.email });
+
+    if (!staff) {
+      return response.responseErrorMessage(res, 404, {
+        error: "There is no account exists with this email!",
+      });
+    }
+
+    const is_match_password: boolean = await staff_service.isMatchStaffPassword(
+      { staff, password: value.password }
+    );
+
+    if (!is_match_password) {
+      return response.responseErrorMessage(res, 401, {
+        error: "Old password does not match!",
+      });
+    }
+
+    const updated_staff: staff_type.THydratedStaffDocument | null =
+      await staff_service.updateStaffPassword({
+        staff,
+        new_password: value.new_password,
+      });
+
+    if (!updated_staff) {
+      return response.responseErrorMessage(res, 500, {
+        error: "Server error occurred! please try again",
+      });
+    }
+
+    const { data_except_password } = document_extractor.extractStaffDocument({
+      staff: updated_staff,
+    });
+
+    return response.responseSuccessData(res, 200, {
+      code: 200,
+      message: "Password changed successfully",
+      staff: data_except_password,
+      links: {
+        self: "/auth/staffs/change-passwor",
+        profile: `/staffs/s/${data_except_password._id}/profile`,
+      },
+    });
+  } catch (e) {
+    return next(e);
+  }
+};
