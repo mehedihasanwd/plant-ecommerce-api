@@ -63,7 +63,7 @@ export const update_staff_role_validate_schema: joi.ObjectSchema<staff_type.IPat
     role: role_schema,
   });
 
-export const update_staff_by_id: joi.ObjectSchema<staff_type.IUpdateStaffById> =
+export const update_staff_by_id: joi.ObjectSchema<staff_type.IPutUpdateStaff> =
   joi.object({
     name: common_validator_schema.name_schema,
     gender: common_validator_schema.gender_schema,
