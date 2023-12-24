@@ -240,3 +240,24 @@ export const postLoginStaff: RequestHandler = async (req, res, next) => {
     return next(e);
   }
 };
+
+export const postLogoutStaff: RequestHandler = async (req, res, next) => {
+  const refresh_token = req.cookies?.refresh_token as string;
+
+  if (!refresh_token) {
+    return response.responseErrorMessage(res, 401, { error: "Unauthorized!" });
+  }
+
+  try {
+    return response.responseSuccessDataAndClearCookie(res, 200, {
+      code: 200,
+      message: "Logged out successfully",
+      links: {
+        self: "/auth/staffs/logout",
+        login: "/auth/staffs/login",
+      },
+    });
+  } catch (e) {
+    return next(e);
+  }
+};
