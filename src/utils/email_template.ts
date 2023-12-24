@@ -27,15 +27,15 @@ export const registerAccountEmailTemplate = ({
           Please click the following 'Register account' button to verify your email and complete registartion.
         </p>
 
-        <a href="${dotenvconfig.DASHBOARD_URL}/verify-email?token=${access_token}" style="color: #fff; background-color: #010101; text-decoration: none; padding: 0.5rem 1.25rem 0.75rem; border: none; outline: none">
+        <a href="${dotenvconfig.DASHBOARD_URL}/verify-email?token=${access_token}" style="color: #fff; background-color: #010101; font-size: 1rem; font-weight: 500; text-decoration: none; padding: 0.5rem 1rem; border: none; outline: none; border-radius: 0.15rem; margin: 0.75rem 0">
           Register account
         </a>
 
-        <p style="margin: 0.75rem 0px">
+        <p>
           This link will expire in <strong>15 minutes</strong>
         </p>
 
-        <p style="margin: 1.25rem 0px 0px 0px">
+        <p style="margin: 1rem 0 0 0">
           If you did not initiate this request, please contact us immediately at ${dotenvconfig.EMAIL_USER}
         </p>
 
@@ -43,7 +43,7 @@ export const registerAccountEmailTemplate = ({
           Note: Your account will be deleted even after registration if our CEO don't want you to become one of our staff. 
         </p>
 
-        <p style="margin: 0.75rem 0>
+        <p style="margin: 0.75rem 0">
           Thank you
         </p>
 
@@ -61,15 +61,15 @@ export const registerAccountEmailTemplate = ({
           Please click the following 'Register account' button to verify your email and complete registartion.
         </p>
 
-        <a href="${dotenvconfig.SITE_URL}/verify-email?token=${access_token}" style="color: #fff; background-color: #010101; text-decoration: none; padding: 0.5rem 1.25rem 0.75rem; border: none; outline: none">
+        <a href="${dotenvconfig.SITE_URL}/verify-email?token=${access_token}" style="color: #fff; background-color: #010101; font-size: 1rem; font-weight: 500; text-decoration: none; padding: 0.5rem 1rem; border: none; outline: none; border-radius: 0.15rem; margin: 0.75rem 0">
           Register account
         </a>
 
-        <p style="margin: 0.75rem 0px">
+        <p>
           This link will expire in <strong>15 minutes</strong>
         </p>
 
-        <p style="margin: 1.25rem 0px 0px 0px">
+        <p style="margin: 1rem 0 0 0">
           If you did not initiate this request, please contact us immediately at ${dotenvconfig.EMAIL_USER}
         </p>
 
@@ -99,15 +99,15 @@ export const resetAccountPasswordEmailTemplate = ({
       </p>
 
 
-      <a href="${dotenvconfig.SITE_URL}/reset-password?token=${access_token}" style="color: #fff; background-color: #010101; text-decoration: none; padding: 0.5rem 1.25rem 0.75rem; border: none; outline: none">
+      <a href="${dotenvconfig.SITE_URL}/reset-password?token=${access_token}" style="color: #fff; background-color: #010101; font-size: 1rem; font-weight: 500; text-decoration: none; padding: 0.5rem 1rem; border: none; outline: none; border-radius: 0.15rem; margin: 0.75rem 0">
         Reset Password
       </a>
 
-      <p style="margin: 0.75rem 0px">
+      <p>
         This link will expire in <strong>15 minutes</strong>
       </p>
 
-      <p style="margin: 1.25rem 0px 0px 0px">
+      <p style="margin: 1rem 0 0 0">
         If you did not initiate this request, please contact us immediately at ${dotenvconfig.EMAIL_USER}
       </p>
 
@@ -158,15 +158,15 @@ export const updateAccountEmailTemplate = ({
           Please click the following 'Update Email' button to verify and update your email.
         </p>
 
-        <a href="${link}/verify-account-email?token=${access_token}" style="color: #fff; background-color: #010101; text-decoration: none; padding: 0.5rem 1.25rem 0.75rem; border: none; outline: none">
+        <a href="${link}/verify-account-email?token=${access_token}" style="color: #fff; background-color: #010101; font-size: 1rem; font-weight: 500; text-decoration: none; padding: 0.5rem 1rem; border: none; outline: none; border-radius: 0.15rem; margin: 0.75rem 0">
           Update Email
         </a>
 
-        <p style="margin: 0.75rem 0px">
+        <p>
           This link will expire in <strong>15 minutes</strong>
         </p>
 
-        <p style="margin: 1.25rem 0px 0px 0px">
+        <p style="margin: 1rem 0 0 0">
           If you did not initiate this request, please contact us immediately at ${dotenvconfig.EMAIL_USER}
         </p>
 
