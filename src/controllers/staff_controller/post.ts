@@ -261,3 +261,46 @@ export const postLogoutStaff: RequestHandler = async (req, res, next) => {
     return next(e);
   }
 };
+
+export const postForgotPassword: RequestHandler = async (req, res, next) => {
+  const { value, error } =
+    staff_validator.forgot_password_validate_schema.validate({
+      email: req.body?.email,
+    });
+
+  if (error) {
+    return response.responseErrorMessage(res, 400, {
+      error: error.details[0].message,
+    });
+  }
+
+  try {
+    const staff: staff_type.THydratedStaffDocument | null =
+      await staff_service.findStaffByProp({ key: "email", value: value.email });
+
+    if (!staff) {
+      return response.responseErrorMessage(res, 404, {
+        error: "There is no account exists with this email!",
+      });
+    }
+
+    const access_token: string = token.resetPasswordToken({
+      payload: { email: staff.email },
+      secretKey: dotenvconfig.JWT_ACCESS,
+      expiresIn: "15m",
+    });
+
+    const email_body: common_type.IEmailBody =
+      email_template.resetAccountPasswordEmailTemplate({
+        receiver_email: staff.email,
+        receiver_name: staff.name,
+        access_token,
+      });
+
+    const message: string = `Email has beens sent to ${value.email}, please check your email and follow the instructions to reset your password`;
+
+    return mailer.sendEmail(res, email_body, message);
+  } catch (e) {
+    return next(e);
+  }
+};
