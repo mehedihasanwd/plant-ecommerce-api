@@ -418,11 +418,10 @@ export const patch_update_staff_email = {
 
       "200": {
         [props.description]: "E-mail updated successfully",
-        headers,
         [props.content]: {
           [props.application_json]: {
             [props.schema]: {
-              ...prop_type.object_id,
+              ...prop_type.object_type,
               [props.properties]: {
                 code: {
                   ...prop_type.integer_type,
