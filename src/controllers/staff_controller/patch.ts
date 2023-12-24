@@ -1,12 +1,10 @@
 import jwt from "jsonwebtoken";
 import { RequestHandler } from "express";
-import { staff_service, mailer, redis_service } from "../../services";
+import { staff_service, redis_service } from "../../services";
 import { staff_validator } from "../../validators";
 import {
   response,
   errorReducer,
-  token,
-  email_template,
   document_extractor,
   create_cache_key,
 } from "../../utils";
@@ -178,6 +176,98 @@ export const patchChangeStaffPassword: RequestHandler = async (
         profile: `/staffs/s/${data_except_password._id}/profile`,
       },
     });
+  } catch (e) {
+    return next(e);
+  }
+};
+
+export const patchUpdateStaffEmail: RequestHandler = async (req, res, next) => {
+  const { value, error } =
+    staff_validator.update_staff_email_validate_schema.validate({
+      token: req.body?.token,
+    });
+
+  if (error) {
+    return response.responseErrorMessage(res, 400, {
+      error: error.details[0].message,
+    });
+  }
+
+  try {
+    jwt.verify(
+      value.token,
+      dotenvconfig.JWT_ACCESS,
+      async (
+        err: jwt.VerifyErrors | null,
+        decoded: jwt.JwtPayload | string | undefined
+      ) => {
+        if (err) {
+          return response.responseErrorMessage(res, 401, {
+            error:
+              "Invalid token or expired! please try again using a valid one",
+          });
+        }
+
+        const decoded_token = decoded as staff_type.IPostVerifyStaffEmail;
+
+        const staff: staff_type.THydratedStaffDocument | null =
+          await staff_service.findStaffByProp({
+            key: "email",
+            value: decoded_token.email,
+          });
+
+        if (!staff) {
+          return response.responseErrorMessage(res, 404, {
+            error: "There is no account exists with this email!",
+          });
+        }
+
+        const updated_staff: staff_type.THydratedStaffDocument | null =
+          await staff_service.updateStaffEmail({
+            staff,
+            new_email: decoded_token.new_email,
+          });
+
+        if (!updated_staff) {
+          return response.responseErrorMessage(res, 500, {
+            error: "Server error occurred! please try again",
+          });
+        }
+
+        const { access_token } = await staff_service.createStaffAuthTokenTokens(
+          { staff: updated_staff }
+        );
+
+        const { data_except_password } =
+          document_extractor.extractStaffDocument({ staff: updated_staff });
+
+        // clear staffs from cache
+        await redis_service.clearKeys({ key: "staffs" });
+
+        // save staff in cache (3600 * 24 * 2 - for 2 days)
+        const cache_key: string = create_cache_key.createKeyForDocument({
+          key: "staff",
+          value: data_except_password._id.toString(),
+        });
+
+        await redis_service.saveToCache({
+          key: cache_key,
+          document: data_except_password,
+          EX: 3600 * 24 * 2,
+        });
+
+        return response.responseSuccessData(res, 200, {
+          code: 200,
+          message: "Email updated successfully",
+          access_token,
+          staff: data_except_password,
+          links: {
+            self: "/auth/staffs/update-staff-email",
+            profile: `/staffs/s/${data_except_password._id}/profile`,
+          },
+        });
+      }
+    );
   } catch (e) {
     return next(e);
   }
