@@ -5,6 +5,7 @@ import * as token from "./token";
 import * as email_template from "./email_template";
 import * as document_extractor from "./document_extractor";
 import * as create_cache_key from "./create_cache_key";
+import { isValidParamId } from "./param_id_validator";
 
 export {
   response,
@@ -14,4 +15,5 @@ export {
   email_template,
   document_extractor,
   create_cache_key,
+  isValidParamId,
 };
