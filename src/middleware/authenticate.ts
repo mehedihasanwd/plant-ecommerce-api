@@ -230,25 +230,37 @@ export const authorizeAdminStaff: RequestHandler = (req, res, next) => {
 };
 
 export const authorizeUserSelfOrStaff: RequestHandler = (req, res, next) => {
-  authenticateToken(req, res, () => {
-    if (!req.user) return;
+  authenticateToken(req, res, async () => {
+    if (!req.user) return permissionDeniedError(res);
 
-    const staff_roles: string[] = [
+    const staff: staff_type.THydratedStaffDocument | null =
+      await staff_service.findStaffByProp({
+        key: "_id",
+        value: req.user._id.toString(),
+      });
+
+    const user: user_type.THydratedUserDocument | null =
+      await user_service.findUserByProp({ key: "_id", value: req.user._id });
+
+    if (!staff || !user) return permissionDeniedError(res);
+
+    const auth_staff_roles: string[] = [
       auth_account_roles.admin,
       auth_account_roles.editor,
     ];
 
-    const is_user_self: boolean =
-      req.user.role === "user" &&
-      (req.user.email === req.body?.email ||
-        req.user._id === req.params?.userId ||
-        req.user._id === req.query?.userId);
+    const is_staff: boolean = auth_staff_roles.includes(staff.role);
 
-    if (is_user_self || staff_roles.includes(req.user.role)) {
+    const is_user_self: boolean =
+      user.email === req.user.email ||
+      user._id.toString() === req.params?.userId ||
+      user._id.toString() === req.query?.userId;
+
+    if (is_staff || is_user_self) {
       return next();
-    } else {
-      return permissionDeniedError(res);
     }
+
+    return permissionDeniedError(res);
   });
 };
 
