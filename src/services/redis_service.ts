@@ -1,6 +1,5 @@
 import redis, { createClient } from "redis";
 import dotenvconfig from "../config/dotenvconfig";
-import { staff_type } from "../types";
 
 const redis_client: redis.RedisClientType = createClient({
   password: `${dotenvconfig.REDIS_PASSWORD}`,
@@ -46,13 +45,11 @@ export const removeFromCache = async ({
   return await redis_client.del(key);
 };
 
-export type TDocument = staff_type.THydratedStaffDocument;
-
 export const getDocumentFromCache = async ({
   key,
-}: IKey): Promise<TDocument | Array<TDocument> | null> => {
+}: IKey): Promise<string | null> => {
   const cached_key: string | null = await redis_client.get(key);
-  return cached_key ? JSON.parse(cached_key) : null;
+  return cached_key;
 };
 
 export const getCacheKeys = async (): Promise<string[] | null> => {
