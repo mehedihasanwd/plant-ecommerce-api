@@ -37,6 +37,12 @@ export const findStaffs = async ({
       },
 
       { $limit: limit },
+
+      {
+        $project: {
+          password: 0,
+        },
+      },
     ]);
   }
 
@@ -61,6 +67,12 @@ export const findStaffs = async ({
       },
 
       { $limit: limit },
+
+      {
+        $project: {
+          password: 0,
+        },
+      },
     ]);
   }
 
@@ -79,12 +91,24 @@ export const findStaffs = async ({
       },
 
       { $limit: limit },
+
+      {
+        $project: {
+          password: 0,
+        },
+      },
     ]);
   }
 
   if (!skip && !limit && !search_by) {
     staffs = await Staff.aggregate([
       { $sort: { _id: sort_type === "asc" ? 1 : -1 } },
+
+      {
+        $project: {
+          password: 0,
+        },
+      },
     ]);
   }
 
