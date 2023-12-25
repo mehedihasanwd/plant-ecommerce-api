@@ -1,14 +1,4 @@
-interface IGetPagination {
-  current_page: number;
-  total_pages: number;
-  total_items: number;
-  prev_page: number | null;
-  next_page: number | null;
-  limit: number;
-}
-
-interface IGetPaginationLinks
-  extends Omit<IGetPagination, "total_pages" | "total_items"> {
+interface ICollection {
   collection:
     | "staffs"
     | "users"
@@ -19,6 +9,19 @@ interface IGetPaginationLinks
     | "coupons";
 }
 
+interface IGetPagination extends ICollection {
+  current_page: number;
+  total_pages: number;
+  total_items: number;
+  prev_page: number | null;
+  next_page: number | null;
+  limit: number;
+}
+
+interface IGetPaginationLinks
+  extends Omit<IGetPagination, "total_pages" | "total_items">,
+    ICollection {}
+
 export const getPagination = ({
   current_page,
   total_pages,
@@ -26,18 +29,21 @@ export const getPagination = ({
   prev_page,
   next_page,
   limit,
+  collection,
 }: IGetPagination) => {
+  const prop_name: string = `total_${collection}`;
+
   let pagination: {
     total_pages: number;
     current_page: number;
     prev_page?: number;
     next_page?: number;
     limit: number;
-    total_items: number;
+    [key: string]: any;
   } = {
     total_pages,
     current_page,
-    total_items,
+    [prop_name]: total_items,
     limit,
     prev_page: undefined,
     next_page: undefined,
@@ -48,8 +54,8 @@ export const getPagination = ({
       total_pages,
       current_page,
       prev_page,
+      [prop_name]: total_items,
       limit,
-      total_items,
     };
   }
 
@@ -58,8 +64,8 @@ export const getPagination = ({
       total_pages,
       current_page,
       next_page,
+      [prop_name]: total_items,
       limit,
-      total_items,
     };
   }
 
@@ -69,8 +75,8 @@ export const getPagination = ({
       current_page,
       prev_page,
       next_page,
+      [prop_name]: total_items,
       limit,
-      total_items,
     };
   }
 
@@ -78,8 +84,8 @@ export const getPagination = ({
     pagination = {
       total_pages,
       current_page,
+      [prop_name]: total_items,
       limit,
-      total_items,
     };
   }
 
