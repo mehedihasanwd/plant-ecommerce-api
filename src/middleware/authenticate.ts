@@ -183,19 +183,27 @@ export const authorizeStaffRolesAndSelf: RequestHandler = (req, res, next) => {
 };
 
 export const authorizeStaff: RequestHandler = (req, res, next) => {
-  authenticateToken(req, res, () => {
-    if (!req.user) return;
+  authenticateToken(req, res, async () => {
+    if (!req.user) return permissionDeniedError(res);
+
+    const staff: staff_type.THydratedStaffDocument | null =
+      await staff_service.findStaffByProp({
+        key: "_id",
+        value: req.user._id.toString(),
+      });
+
+    if (!staff) return permissionDeniedError(res);
 
     const staff_roles: string[] = [
       auth_account_roles.admin,
       auth_account_roles.editor,
     ];
 
-    if (staff_roles.includes(req.user.role)) {
+    if (staff_roles.includes(staff.role)) {
       return next();
-    } else {
-      return permissionDeniedError(res);
     }
+
+    return permissionDeniedError(res);
   });
 };
 
