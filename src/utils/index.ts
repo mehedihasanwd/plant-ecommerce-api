@@ -6,7 +6,7 @@ import * as email_template from "./email_template";
 import * as document_extractor from "./document_extractor";
 import * as create_cache_key from "./create_cache_key";
 import { isValidParamId } from "./param_id_validator";
-import { getPagination } from "./pagination";
+import * as pagination from "./pagination";
 
 export {
   response,
@@ -17,5 +17,5 @@ export {
   document_extractor,
   create_cache_key,
   isValidParamId,
-  getPagination,
+  pagination,
 };
