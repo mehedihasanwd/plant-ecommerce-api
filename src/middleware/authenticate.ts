@@ -269,22 +269,32 @@ export const authorizeUserSelfOrAdminStaff: RequestHandler = (
   res,
   next
 ) => {
-  authenticateToken(req, res, () => {
-    if (!req.user) return;
+  authenticateToken(req, res, async () => {
+    if (!req.user) return permissionDeniedError(res);
 
-    const is_admin: boolean = req.user.role === "admin";
+    const staff: staff_type.THydratedStaffDocument | null =
+      await staff_service.findStaffByProp({
+        key: "_id",
+        value: req.user._id.toString(),
+      });
+
+    const user: user_type.THydratedUserDocument | null =
+      await user_service.findUserByProp({ key: "_id", value: req.user._id });
+
+    if (!staff || !user) return permissionDeniedError(res);
+
+    const is_admin: boolean = staff.role === auth_account_roles.admin;
 
     const is_user_self: boolean =
-      req.user.role === "user" &&
-      (req.user.email === req.body?.email ||
-        req.user._id === req.params?.userId ||
-        req.user._id === req.query?.userId);
+      user.email === req.user.email ||
+      user._id.toString() === req.params?.userId ||
+      user._id.toString() === req.query?.userId;
 
-    if (is_user_self || is_admin) {
+    if (is_admin || is_user_self) {
       return next();
-    } else {
-      return permissionDeniedError(res);
     }
+
+    return permissionDeniedError(res);
   });
 };
 
