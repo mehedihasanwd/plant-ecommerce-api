@@ -298,45 +298,36 @@ export const authorizeUserSelfOrAdminStaff: RequestHandler = (
   });
 };
 
-export const authorizeUserOrStaff: RequestHandler = (req, res, next) => {
-  authenticateToken(req, res, () => {
-    if (!req.user) return;
-
-    const auth_roles: string[] = [
-      auth_account_roles.user,
-      auth_account_roles.admin,
-      auth_account_roles.editor,
-    ];
-
-    if (auth_roles.includes(req.user.role)) {
-      return next();
-    } else {
-      return permissionDeniedError(res);
-    }
-  });
-};
-
 export const authorizeSuperAdminOrStaffSelf: RequestHandler = (
   req,
   res,
   next
 ) => {
-  authenticateToken(req, res, () => {
-    if (!req.user) return;
+  authenticateToken(req, res, async () => {
+    if (!req.user) return permissionDeniedError(res);
 
-    const staff_roles: string[] = [
+    const staff: staff_type.THydratedStaffDocument | null =
+      await staff_service.findStaffByProp({
+        key: "_id",
+        value: req.user._id.toString(),
+      });
+
+    if (!staff) return permissionDeniedError(res);
+
+    const is_super_admin: boolean =
+      staff.role === auth_account_roles.admin &&
+      staff.email === dotenvconfig.SUPER_ADMIN;
+
+    const auth_staff_roles: string[] = [
       auth_account_roles.admin,
       auth_account_roles.editor,
     ];
 
-    const is_super_admin: boolean =
-      req.user.role === "admin" && req.user.email === dotenvconfig.SUPER_ADMIN;
-
     const is_staff_self: boolean =
-      staff_roles.includes(req.user.role) &&
-      (req.user.email === req.body?.email ||
-        req.user._id === req.params?.staffId ||
-        req.user._id === req.query?.staffId);
+      auth_staff_roles.includes(staff.role) &&
+      (staff.email === req.body?.email ||
+        staff._id.toString() === req.params?.staffId ||
+        staff._id.toString() === req.query?.staffId);
 
     if (is_staff_self || is_super_admin) {
       return next();
