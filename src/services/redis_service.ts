@@ -45,7 +45,7 @@ export const removeFromCache = async ({
   return await redis_client.del(key);
 };
 
-type TDocument = object | object[];
+export type TDocument = object | object[];
 
 export const getDocumentFromCache = async ({
   key,
