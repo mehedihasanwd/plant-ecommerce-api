@@ -46,6 +46,22 @@ export const findStaffs = async ({
     ]);
   }
 
+  if (!skip && limit) {
+    staffs = await Staff.aggregate([
+      {
+        $sort: { _id: sort_type === "asc" ? 1 : -1 },
+      },
+
+      { $limit: limit },
+
+      {
+        $project: {
+          password: 0,
+        },
+      },
+    ]);
+  }
+
   if (skip && limit && search_by) {
     staffs = await Staff.aggregate([
       {
