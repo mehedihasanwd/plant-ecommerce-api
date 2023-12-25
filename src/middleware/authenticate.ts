@@ -1,7 +1,7 @@
 import express, { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import dotenvconfig from "../config/dotenvconfig";
-import { payload_type, staff_type } from "../types";
+import { payload_type, staff_type, user_type } from "../types";
 import { response } from "../utils";
 import { staff_service, user_service } from "../services";
 
@@ -97,20 +97,27 @@ export const authorizeSuperAdmin: RequestHandler = (req, res, next) => {
 };
 
 export const authorizeUserSelf: RequestHandler = (req, res, next) => {
-  authenticateToken(req, res, () => {
-    if (!req.user) return;
+  authenticateToken(req, res, async () => {
+    if (!req.user) return permissionDeniedError(res);
+
+    const user: user_type.THydratedUserDocument | null =
+      await user_service.findUserByProp({
+        key: "_id",
+        value: req.user._id.toString(),
+      });
+
+    if (!user) return permissionDeniedError(res);
 
     const is_user_self: boolean =
-      req.user.role === auth_account_roles.user &&
-      (req.user.email === req.body?.email ||
-        req.user._id === req.params?.userId ||
-        req.user._id === req.query?.userId);
+      user.email === req.body?.email ||
+      user._id.toString() === req.params?.userId ||
+      user._id.toString() === req.query?.userId;
 
     if (is_user_self) {
       return next();
-    } else {
-      return permissionDeniedError(res);
     }
+
+    return permissionDeniedError(res);
   });
 };
 
