@@ -138,7 +138,12 @@ export const authorizeStaffSelf: RequestHandler = (req, res, next) => {
       staff._id.toString() === req.params?.staffId ||
       staff._id.toString() === req.query?.staffId;
 
-    if (is_staff_self) {
+    const staff_auth_roles: string[] = [
+      auth_account_roles.admin,
+      auth_account_roles.editor,
+    ];
+
+    if (is_staff_self && staff_auth_roles.includes(staff.role)) {
       return next();
     }
 
