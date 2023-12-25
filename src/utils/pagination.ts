@@ -7,6 +7,18 @@ interface IGetPagination {
   limit: number;
 }
 
+interface IGetPaginationLinks
+  extends Omit<IGetPagination, "total_pages" | "total_items"> {
+  collection:
+    | "staffs"
+    | "users"
+    | "categories"
+    | "products"
+    | "orders"
+    | "reviews"
+    | "coupons";
+}
+
 export const getPagination = ({
   current_page,
   total_pages,
@@ -58,4 +70,44 @@ export const getPagination = ({
   }
 
   return pagination;
+};
+
+export const getPaginationLinks = ({
+  current_page,
+  prev_page,
+  next_page,
+  limit,
+  collection,
+}: IGetPaginationLinks) => {
+  let links = {};
+
+  if (prev_page && next_page) {
+    links = {
+      self: `/${collection}?page=${current_page}&limit=${limit}`,
+      prev: `/${collection}?page=${prev_page}&limit=${limit}`,
+      next: `/${collection}?page=${next_page}&limit=${limit}`,
+    };
+  }
+
+  if (prev_page && !next_page) {
+    links = {
+      self: `/${collection}?page=${current_page}&limit=${limit}`,
+      prev: `/${collection}?page=${prev_page}&limit=${limit}`,
+    };
+  }
+
+  if (!prev_page && next_page) {
+    links = {
+      self: `/${collection}?page=${current_page}&limit=${limit}`,
+      next: `/${collection}?page=${next_page}&limit=${limit}`,
+    };
+  }
+
+  if (!prev_page && !next_page) {
+    links = {
+      self: `/${collection}?page=${current_page}&limit=${limit}`,
+    };
+  }
+
+  return links;
 };
