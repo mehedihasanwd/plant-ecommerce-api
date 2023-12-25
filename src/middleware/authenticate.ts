@@ -147,25 +147,33 @@ export const authorizeStaffSelf: RequestHandler = (req, res, next) => {
 };
 
 export const authorizeStaffRolesAndSelf: RequestHandler = (req, res, next) => {
-  authenticateToken(req, res, () => {
-    if (!req.user) return;
+  authenticateToken(req, res, async () => {
+    if (!req.user) return permissionDeniedError(res);
 
-    const staff_roles: string[] = [
+    const staff: staff_type.THydratedStaffDocument | null =
+      await staff_service.findStaffByProp({
+        key: "_id",
+        value: req.user._id.toString(),
+      });
+
+    if (!staff) return permissionDeniedError(res);
+
+    const is_staff_self: boolean =
+      staff.email === req.body?.email ||
+      staff._id.toString() === req.params?.staffId ||
+      staff._id.toString() === req.query?.staffId;
+
+    const staff_auth_roles: string[] = [
       auth_account_roles.admin,
       auth_account_roles.editor,
       auth_account_roles.guest,
     ];
 
-    const is_staff_self: boolean =
-      req.user.email === req.body?.email ||
-      req.user._id === req.params?.staffId ||
-      req.user._id === req.query?.staffId;
-
-    if (staff_roles.includes(req.user.role) && is_staff_self) {
+    if (staff_auth_roles.includes(staff.role) && is_staff_self) {
       return next();
-    } else {
-      return permissionDeniedError(res);
     }
+
+    return permissionDeniedError(res);
   });
 };
 
