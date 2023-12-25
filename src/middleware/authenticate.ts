@@ -208,16 +208,24 @@ export const authorizeStaff: RequestHandler = (req, res, next) => {
 };
 
 export const authorizeAdminStaff: RequestHandler = (req, res, next) => {
-  authenticateToken(req, res, () => {
-    if (!req.user) return;
+  authenticateToken(req, res, async () => {
+    if (!req.user) return permissionDeniedError(res);
 
-    const is_admin: boolean = req.user.role === auth_account_roles.admin;
+    const staff: staff_type.THydratedStaffDocument | null =
+      await staff_service.findStaffByProp({
+        key: "_id",
+        value: req.user._id.toString(),
+      });
+
+    if (!staff) return permissionDeniedError(res);
+
+    const is_admin: boolean = staff.role === auth_account_roles.admin;
 
     if (is_admin) {
       return next();
-    } else {
-      return permissionDeniedError(res);
     }
+
+    return permissionDeniedError(res);
   });
 };
 
