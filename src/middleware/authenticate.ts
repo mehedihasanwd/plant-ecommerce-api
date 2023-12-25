@@ -1,8 +1,9 @@
 import express, { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import dotenvconfig from "../config/dotenvconfig";
-import { payload_type } from "../types";
+import { payload_type, staff_type } from "../types";
 import { response } from "../utils";
+import { staff_service, user_service } from "../services";
 
 interface IAuthAccountRoles {
   admin: "admin";
@@ -72,17 +73,26 @@ const authenticateToken: RequestHandler = (req, res, next) => {
 };
 
 export const authorizeSuperAdmin: RequestHandler = (req, res, next) => {
-  authenticateToken(req, res, () => {
-    if (!req.user) return;
+  authenticateToken(req, res, async () => {
+    if (!req.user) return permissionDeniedError(res);
 
-    if (
-      req.user.role === auth_account_roles.admin &&
-      req.user.email === dotenvconfig.SUPER_ADMIN
-    ) {
-      return next();
-    } else {
+    const staff: staff_type.THydratedStaffDocument | null =
+      await staff_service.findStaffByProp({
+        key: "_id",
+        value: req.user._id.toString(),
+      });
+
+    if (!staff) {
       return permissionDeniedError(res);
     }
+
+    const is_super_admin: boolean = staff.email === dotenvconfig.SUPER_ADMIN;
+
+    if (is_super_admin) {
+      return next();
+    }
+
+    return permissionDeniedError(res);
   });
 };
 
