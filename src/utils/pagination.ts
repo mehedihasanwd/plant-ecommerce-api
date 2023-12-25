@@ -27,7 +27,21 @@ export const getPagination = ({
   next_page,
   limit,
 }: IGetPagination) => {
-  let pagination = {};
+  let pagination: {
+    total_pages: number;
+    current_page: number;
+    prev_page?: number;
+    next_page?: number;
+    limit: number;
+    total_items: number;
+  } = {
+    total_pages,
+    current_page,
+    total_items,
+    limit,
+    prev_page: undefined,
+    next_page: undefined,
+  };
 
   if (prev_page && !next_page) {
     pagination = {
@@ -78,8 +92,12 @@ export const getPaginationLinks = ({
   next_page,
   limit,
   collection,
-}: IGetPaginationLinks) => {
-  let links = {};
+}: IGetPaginationLinks): { self: string; prev?: string; next?: string } => {
+  let links: { self: string; prev?: string; next?: string } = {
+    self: "",
+    prev: undefined,
+    next: undefined,
+  };
 
   if (prev_page && next_page) {
     links = {
