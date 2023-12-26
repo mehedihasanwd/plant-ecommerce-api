@@ -20,6 +20,7 @@ export const patchResetStaffPassword: RequestHandler = async (
   const { value, error } =
     staff_validator.reset_password_validate_schema.validate({
       token: req.body?.token,
+      new_password: req.body?.new_password,
     });
 
   if (error) {
