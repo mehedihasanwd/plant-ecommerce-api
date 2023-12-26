@@ -63,11 +63,13 @@ interface IClearKeysParam {
 
 export const clearKeys = async ({
   key,
-}: IClearKeysParam): Promise<number | ""> => {
+}: IClearKeysParam): Promise<number | null> => {
   const keys: Array<string> | null = await getCacheKeys();
   const matched_keys: Array<string> | null = keys
     ? keys.filter((item: string) => item.match(key))
     : null;
 
-  return matched_keys ? await removeFromCache({ key: matched_keys }) : "";
+  if (!matched_keys || matched_keys.length < 1) return null;
+
+  return await removeFromCache({ key: matched_keys });
 };
