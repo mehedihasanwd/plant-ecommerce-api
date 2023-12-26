@@ -297,7 +297,7 @@ export const postForgotPassword: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const postVerifyuserEmail: RequestHandler = async (req, res, next) => {
+export const postVerifyUserEmail: RequestHandler = async (req, res, next) => {
   const { value, error } =
     user_validator.verify_user_email_validate_schema.validate({
       email: req.body?.email,
