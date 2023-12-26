@@ -120,7 +120,7 @@ export const postRegisterStaff: RequestHandler = async (req, res, next) => {
         }
 
         const { access_token, refresh_token } =
-          (await staff_service.createStaffAuthTokenTokens({
+          (await staff_service.createStaffAuthTokens({
             staff: new_staff,
           })) as staff_type.IStaffAuthTokens;
 
@@ -208,7 +208,7 @@ export const postLoginStaff: RequestHandler = async (req, res, next) => {
     }
 
     const { access_token, refresh_token } =
-      await staff_service.createStaffAuthTokenTokens({ staff });
+      await staff_service.createStaffAuthTokens({ staff });
 
     const { data_except_password } = document_extractor.extractStaffDocument({
       staff,
