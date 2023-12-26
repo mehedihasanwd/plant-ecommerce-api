@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { RequestHandler } from "express";
-import { staff_service, mailer, redis_service } from "../../services";
-import { staff_validator } from "../../validators";
+import { user_service, mailer, redis_service } from "../../services";
+import { user_validator } from "../../validators";
 import {
   response,
   errorReducer,
@@ -10,16 +10,17 @@ import {
   document_extractor,
   create_cache_key,
 } from "../../utils";
-import { common_type, staff_type } from "../../types";
+import { common_type, user_type } from "../../types";
 import dotenvconfig from "../../config/dotenvconfig";
 
 export const postVerifyEmail: RequestHandler = async (req, res, next) => {
-  const { value, error } =
-    staff_validator.verify_email_validate_schema.validate({
+  const { value, error } = user_validator.verify_email_validate_schema.validate(
+    {
       name: req.body?.name,
       email: req.body?.email,
       password: req.body?.password,
-    });
+    }
+  );
 
   if (error) {
     return response.responseErrorMessages(res, 400, {
@@ -28,10 +29,10 @@ export const postVerifyEmail: RequestHandler = async (req, res, next) => {
   }
 
   try {
-    const staff: staff_type.THydratedStaffDocument | null =
-      await staff_service.findStaffByProp({ key: "email", value: value.email });
+    const user: user_type.THydratedUserDocument | null =
+      await user_service.findUserByProp({ key: "email", value: value.email });
 
-    if (staff) {
+    if (user) {
       return response.responseErrorMessage(res, 409, {
         error: "E-mail already exists! please try again using a new one",
       });
@@ -49,7 +50,7 @@ export const postVerifyEmail: RequestHandler = async (req, res, next) => {
 
     const email_body: common_type.IEmailBody =
       email_template.registerAccountEmailTemplate({
-        account: "staff",
+        account: "user",
         receiver_email: value.email,
         receiver_name: value.name,
         access_token,
@@ -63,9 +64,9 @@ export const postVerifyEmail: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const postRegisterStaff: RequestHandler = async (req, res, next) => {
+export const postRegisterUser: RequestHandler = async (req, res, next) => {
   const { value, error } =
-    staff_validator.register_staff_validate_schema.validate({
+    user_validator.register_user_validate_schema.validate({
       token: req.body?.token,
     });
 
@@ -90,22 +91,22 @@ export const postRegisterStaff: RequestHandler = async (req, res, next) => {
           });
         }
 
-        const decoded_token = decoded as staff_type.IPostVerifyEmail;
+        const decoded_token = decoded as user_type.IPostVerifyEmail;
 
-        const staff: staff_type.THydratedStaffDocument | null =
-          await staff_service.findStaffByProp({
+        const user: user_type.THydratedUserDocument | null =
+          await user_service.findUserByProp({
             key: "email",
             value: decoded_token.email,
           });
 
-        if (staff) {
+        if (user) {
           return response.responseErrorMessage(res, 409, {
             error: "Email already exists! please try again using a new one",
           });
         }
 
-        const new_staff: staff_type.THydratedStaffDocument | null =
-          await staff_service.createNewStaff({
+        const new_user: user_type.THydratedUserDocument | null =
+          await user_service.createNewUser({
             data: {
               name: decoded_token.name,
               email: decoded_token.email,
@@ -113,37 +114,27 @@ export const postRegisterStaff: RequestHandler = async (req, res, next) => {
             },
           });
 
-        if (!new_staff) {
+        if (!new_user) {
           return response.responseErrorMessage(res, 500, {
             error: "Server error occurred! please try again",
           });
         }
 
         const { access_token, refresh_token } =
-          (await staff_service.createStaffAuthTokenTokens({
-            staff: new_staff,
-          })) as staff_type.IStaffAuthTokens;
+          (await user_service.createUserAuthTokens({
+            user: new_user,
+          })) as user_type.IUserAuthTokens;
 
-        const { data_except_password } =
-          document_extractor.extractStaffDocument({ staff: new_staff });
+        const { data_except_password } = document_extractor.extractUserDocument(
+          { user: new_user }
+        );
 
-        // send email to super admin
-        if (data_except_password.email !== dotenvconfig.SUPER_ADMIN) {
-          const email_body: common_type.IEmailBody =
-            email_template.emailToSuperAdminTemplate({
-              guest_email: data_except_password.email,
-              guest_name: data_except_password.name,
-            });
+        // clear cached users
+        await redis_service.clearKeys({ key: "users" });
 
-          mailer.sendEmailToSuperAdmin(res, email_body);
-        }
-
-        // clear cached staffs
-        await redis_service.clearKeys({ key: "staffs" });
-
-        // save staff in cache (3600 * 24 * 2 = for 2 days)
+        // save user in cache (3600 * 24 * 2 = for 2 days)
         const cache_key: string = create_cache_key.createKeyForDocument({
-          key: "staff",
+          key: "user",
           value: data_except_password._id.toString(),
         });
 
@@ -161,10 +152,10 @@ export const postRegisterStaff: RequestHandler = async (req, res, next) => {
             code: 201,
             message: "Registered successfully",
             access_token,
-            staff: data_except_password,
+            user: data_except_password,
             links: {
-              self: "/auth/staffs/register",
-              profile: `/staffs/s/${data_except_password._id}/profile`,
+              self: "/auth/users/register",
+              profile: `/users/u/${data_except_password._id}/profile`,
             },
           }
         );
@@ -175,8 +166,8 @@ export const postRegisterStaff: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const postLoginStaff: RequestHandler = async (req, res, next) => {
-  const { value, error } = staff_validator.login_validate_schema.validate({
+export const postLoginUser: RequestHandler = async (req, res, next) => {
+  const { value, error } = user_validator.login_validate_schema.validate({
     email: req.body?.email,
     password: req.body?.password,
   });
@@ -188,18 +179,19 @@ export const postLoginStaff: RequestHandler = async (req, res, next) => {
   }
 
   try {
-    const staff: staff_type.THydratedStaffDocument | null =
-      await staff_service.findStaffByProp({ key: "email", value: value.email });
+    const user: user_type.THydratedUserDocument | null =
+      await user_service.findUserByProp({ key: "email", value: value.email });
 
-    if (!staff) {
+    if (!user) {
       return response.responseErrorMessage(res, 404, {
-        error: "Staff not found!",
+        error: "user not found!",
       });
     }
 
-    const is_match_password: boolean = await staff_service.isMatchStaffPassword(
-      { staff, password: value.password }
-    );
+    const is_match_password: boolean = await user_service.isMatchUserPassword({
+      user,
+      password: value.password,
+    });
 
     if (!is_match_password) {
       return response.responseErrorMessage(res, 401, {
@@ -208,15 +200,15 @@ export const postLoginStaff: RequestHandler = async (req, res, next) => {
     }
 
     const { access_token, refresh_token } =
-      await staff_service.createStaffAuthTokenTokens({ staff });
+      await user_service.createUserAuthTokens({ user });
 
-    const { data_except_password } = document_extractor.extractStaffDocument({
-      staff,
+    const { data_except_password } = document_extractor.extractUserDocument({
+      user,
     });
 
-    // save staff in cache (3600 * 24 * 2 = for 2 days)
+    // save user in cache (3600 * 24 * 2 = for 2 days)
     const cache_key: string = create_cache_key.createKeyForDocument({
-      key: "staff",
+      key: "user",
       value: data_except_password._id.toString(),
     });
 
@@ -230,10 +222,10 @@ export const postLoginStaff: RequestHandler = async (req, res, next) => {
       code: 200,
       message: "Logged in successfully",
       access_token,
-      staff: data_except_password,
+      user: data_except_password,
       links: {
-        self: "/auth/staffs/login",
-        profile: `/staffs/s/${data_except_password._id}/profile`,
+        self: "/auth/users/login",
+        profile: `/users/u/${data_except_password._id}/profile`,
       },
     });
   } catch (e) {
@@ -241,7 +233,7 @@ export const postLoginStaff: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const postLogoutStaff: RequestHandler = async (req, res, next) => {
+export const postLogoutUser: RequestHandler = async (req, res, next) => {
   const refresh_token = req.cookies?.refresh_token as string;
 
   if (!refresh_token) {
@@ -253,8 +245,8 @@ export const postLogoutStaff: RequestHandler = async (req, res, next) => {
       code: 200,
       message: "Logged out successfully",
       links: {
-        self: "/auth/staffs/logout",
-        login: "/auth/staffs/login",
+        self: "/auth/users/logout",
+        login: "/auth/users/login",
       },
     });
   } catch (e) {
@@ -264,7 +256,7 @@ export const postLogoutStaff: RequestHandler = async (req, res, next) => {
 
 export const postForgotPassword: RequestHandler = async (req, res, next) => {
   const { value, error } =
-    staff_validator.forgot_password_validate_schema.validate({
+    user_validator.forgot_password_validate_schema.validate({
       email: req.body?.email,
     });
 
@@ -275,25 +267,25 @@ export const postForgotPassword: RequestHandler = async (req, res, next) => {
   }
 
   try {
-    const staff: staff_type.THydratedStaffDocument | null =
-      await staff_service.findStaffByProp({ key: "email", value: value.email });
+    const user: user_type.THydratedUserDocument | null =
+      await user_service.findUserByProp({ key: "email", value: value.email });
 
-    if (!staff) {
+    if (!user) {
       return response.responseErrorMessage(res, 404, {
         error: "There is no account exists with this email!",
       });
     }
 
     const access_token: string = token.resetPasswordToken({
-      payload: { email: staff.email },
+      payload: { email: user.email },
       secretKey: dotenvconfig.JWT_ACCESS,
       expiresIn: "15m",
     });
 
     const email_body: common_type.IEmailBody =
       email_template.resetAccountPasswordEmailTemplate({
-        receiver_email: staff.email,
-        receiver_name: staff.name,
+        receiver_email: user.email,
+        receiver_name: user.name,
         access_token,
       });
 
@@ -305,9 +297,9 @@ export const postForgotPassword: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const postVerifyStaffEmail: RequestHandler = async (req, res, next) => {
+export const postVerifyuserEmail: RequestHandler = async (req, res, next) => {
   const { value, error } =
-    staff_validator.verify_staff_email_validate_schema.validate({
+    user_validator.verify_user_email_validate_schema.validate({
       email: req.body?.email,
       new_email: req.body?.new_email,
     });
@@ -319,10 +311,10 @@ export const postVerifyStaffEmail: RequestHandler = async (req, res, next) => {
   }
 
   try {
-    const staff: staff_type.THydratedStaffDocument | null =
-      await staff_service.findStaffByProp({ key: "email", value: value.email });
+    const user: user_type.THydratedUserDocument | null =
+      await user_service.findUserByProp({ key: "email", value: value.email });
 
-    if (!staff) {
+    if (!user) {
       return response.responseErrorMessage(res, 404, {
         error: "Account not found!",
       });
@@ -340,9 +332,9 @@ export const postVerifyStaffEmail: RequestHandler = async (req, res, next) => {
     const email_body: common_type.IEmailBody =
       email_template.updateAccountEmailTemplate({
         receiver_email: value.email,
-        receiver_name: staff.name,
+        receiver_name: user.name,
         access_token,
-        account: "staff",
+        account: "user",
       });
 
     const message: string = `Email has been sent to ${value.email}, please check your email and follow the instructions to update your email`;
