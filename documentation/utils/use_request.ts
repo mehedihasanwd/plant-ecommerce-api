@@ -146,6 +146,24 @@ export const forgotPasswordInfo = () => {
   };
 };
 
+export const resetPasswordInfo = () => {
+  return {
+    [props.required]: true,
+    [props.content]: {
+      [props.application_json]: {
+        [props.schema]: {
+          ...prop_type.object_type,
+          [props.properties]: {
+            token: request.token,
+            new_password: request.new_password,
+          },
+          [props.required]: ["token", "new_password"],
+        },
+      },
+    },
+  };
+};
+
 export const updateAccountInfo = () => {
   return {
     [props.required]: true,
