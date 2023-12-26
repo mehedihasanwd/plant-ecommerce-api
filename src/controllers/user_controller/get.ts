@@ -80,3 +80,120 @@ export const getUserById: RequestHandler = async (req, res, next) => {
     return next(e);
   }
 };
+
+export const getUsers: RequestHandler = async (req, res, next) => {
+  const current_page: number = Number(req.query?.page || "1");
+  const limit: number = Number(req.query?.limit || "12");
+  const skip: number = (current_page - 1) * limit;
+  const prev_page: number | null = current_page > 1 ? current_page - 1 : null;
+  const sort_type: "asc" | "dsc" =
+    req.query?.sort_type === "dsc" ? "dsc" : "asc";
+  const search_by: string | undefined = req.query?.search_by
+    ? String(req.query?.search_by)
+    : undefined;
+
+  const cache_key: string = create_cache_key.createKeyForCollection({
+    key: "users",
+    page: current_page,
+    limit,
+    skip,
+    sort_type,
+    search_by,
+  });
+
+  try {
+    const cached_users: string | null =
+      await redis_service.getDocumentFromCache({
+        key: cache_key,
+      });
+
+    if (cached_users) {
+      const parsed_users: Array<user_type.THydratedUserDocumentExceptPassword> =
+        JSON.parse(cached_users);
+
+      const total_users: number = await user_service.countUsers({
+        search_by,
+      });
+
+      const total_pages: number = Math.ceil(total_users / limit);
+      const next_page: number | null =
+        current_page < total_pages ? current_page + 1 : null;
+
+      const get_pagination = pagination.getPagination({
+        collection: "users",
+        current_page,
+        total_items: total_users,
+        total_pages,
+        limit,
+        prev_page,
+        next_page,
+      });
+
+      const get_links = pagination.getPaginationLinks({
+        collection: "users",
+        current_page,
+        prev_page,
+        next_page,
+        limit,
+      });
+
+      return response.responseSuccessData(res, 200, {
+        from_cache: true,
+        code: 200,
+        users: parsed_users,
+        pagination: get_pagination,
+        links: get_links,
+      });
+    }
+
+    const users: Array<user_type.THydratedUserDocumentExceptPassword> | null =
+      await user_service.findUsers({ skip, limit, sort_type, search_by });
+
+    if (!users) {
+      return response.responseErrorMessage(res, 404, {
+        error: "Users not found!",
+      });
+    }
+
+    // save users in cache (3600 * 24 * 2 - for 2 days)
+    await redis_service.saveToCache({
+      key: cache_key,
+      document: users,
+      EX: 3600 * 24 * 2,
+    });
+
+    const total_users: number = await user_service.countUsers({ search_by });
+
+    const total_pages: number = Math.ceil(total_users / limit);
+    const next_page: number | null =
+      current_page < total_pages ? current_page + 1 : null;
+
+    const get_pagination = pagination.getPagination({
+      collection: "users",
+      current_page,
+      total_items: total_users,
+      total_pages,
+      limit,
+      prev_page,
+      next_page,
+    });
+
+    const get_links = pagination.getPaginationLinks({
+      collection: "users",
+      current_page,
+      prev_page,
+      next_page,
+      limit,
+    });
+
+    return response.responseSuccessData(res, 200, {
+      from_cache: false,
+      code: 200,
+      users,
+      pagination: get_pagination,
+      links: get_links,
+    });
+  } catch (e) {
+    return next(e);
+  }
+};
