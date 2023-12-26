@@ -271,7 +271,7 @@ export const patch_reset_password = {
     [props.tags]: [tags.staff_auth],
     [props.security]: [],
     [props.parameters]: [],
-    [props.requestBody]: use_request.bodyToken(),
+    [props.requestBody]: use_request.resetPasswordInfo(),
     [props.responses]: {
       "400": use_response.sendTokenRequired(),
 
