@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
-import { staff_service, redis_service, aws_s3 } from "../../services";
-import { staff_validator } from "../../validators";
+import { user_service, redis_service, aws_s3 } from "../../services";
+import { user_validator } from "../../validators";
 import {
   response,
   errorReducer,
@@ -8,12 +8,12 @@ import {
   create_cache_key,
   isValidParamId,
 } from "../../utils";
-import { common_type, staff_type } from "../../types";
+import { common_type, user_type } from "../../types";
 
-export const putUpdateStaffById: RequestHandler = async (req, res, next) => {
-  const _id = req.params?.staffId as string;
+export const putUpdateUserById: RequestHandler = async (req, res, next) => {
+  const _id = req.params?.userId as string;
   const image = req.files?.image as common_type.TUploadedFile;
-  const { value, error } = staff_validator.update_staff_by_id.validate(
+  const { value, error } = user_validator.update_user_by_id.validate(
     {
       name: req.body?.name,
       gender: req.body?.gender,
@@ -28,7 +28,7 @@ export const putUpdateStaffById: RequestHandler = async (req, res, next) => {
 
   if (!isValidParamId(_id)) {
     return response.responseErrorMessage(res, 401, {
-      error: "Invalid staff id! please try again using a valid one",
+      error: "Invalid user id! please try again using a valid one",
     });
   }
 
@@ -39,20 +39,20 @@ export const putUpdateStaffById: RequestHandler = async (req, res, next) => {
   }
 
   try {
-    const staff: staff_type.THydratedStaffDocument | null =
-      await staff_service.findStaffByProp({ key: "_id", value: _id });
+    const user: user_type.THydratedUserDocument | null =
+      await user_service.findUserByProp({ key: "_id", value: _id });
 
-    if (!staff) {
+    if (!user) {
       return response.responseErrorMessage(res, 404, {
-        error: "Staff not found!",
+        error: "User not found!",
       });
     }
 
     const data_to_update: common_type.IUpdateAccount = {
       image: {
-        isChangedSelf: staff.image.isChangedSelf,
-        key: staff.image.key,
-        url: staff.image.url,
+        isChangedSelf: user.image.isChangedSelf,
+        key: user.image.key,
+        url: user.image.url,
       },
 
       name: value.name,
@@ -76,8 +76,8 @@ export const putUpdateStaffById: RequestHandler = async (req, res, next) => {
 
       if (image_error) return image_error;
 
-      if (staff.image.isChangedSelf) {
-        await aws_s3.removeImageFromS3({ key: staff.image.key });
+      if (user.image.isChangedSelf) {
+        await aws_s3.removeImageFromS3({ key: user.image.key });
       }
 
       const cloud_image: aws_s3.TS3ManagedUpload | undefined =
@@ -89,8 +89,8 @@ export const putUpdateStaffById: RequestHandler = async (req, res, next) => {
         });
       }
 
-      const updated_staff: staff_type.THydratedStaffDocument | null =
-        await staff_service.updateStaffById({
+      const updated_user: user_type.THydratedUserDocument | null =
+        await user_service.updateUserById({
           _id,
           data: {
             ...data_to_update,
@@ -102,27 +102,27 @@ export const putUpdateStaffById: RequestHandler = async (req, res, next) => {
           },
         });
 
-      if (!updated_staff) {
+      if (!updated_user) {
         return response.responseErrorMessage(res, 500, {
           error: "Server error occurred! please try again",
         });
       }
 
-      const { data_except_password } = document_extractor.extractStaffDocument({
-        staff: updated_staff,
+      const { data_except_password } = document_extractor.extractUserDocument({
+        user: updated_user,
       });
 
       const { access_token, refresh_token } =
-        await staff_service.createStaffAuthTokenTokens({
-          staff: updated_staff,
+        await user_service.createUserAuthTokens({
+          user: updated_user,
         });
 
-      // clear staffs from cache
-      await redis_service.clearKeys({ key: "staffs" });
+      // clear users from cache
+      await redis_service.clearKeys({ key: "users" });
 
-      // save staff in cache: 3600 * 24 * 2 - for 2 days
+      // save user in cache: 3600 * 24 * 2 - for 2 days
       const cache_key: string = create_cache_key.createKeyForDocument({
-        key: "staff",
+        key: "user",
         value: data_except_password._id.toString(),
       });
 
@@ -140,39 +140,39 @@ export const putUpdateStaffById: RequestHandler = async (req, res, next) => {
           code: 200,
           message: "Information updated successfully",
           access_token,
-          staff: data_except_password,
+          user: data_except_password,
           links: {
-            self: `/staffs/s/${data_except_password._id}`,
-            profile: `/staffs/s/${data_except_password._id}/profile`,
+            self: `/users/u/${data_except_password._id}`,
+            profile: `/users/u/${data_except_password._id}/profile`,
           },
         }
       );
     }
 
-    const updated_staff: staff_type.THydratedStaffDocument | null =
-      await staff_service.updateStaffById({ _id, data: data_to_update });
+    const updated_user: user_type.THydratedUserDocument | null =
+      await user_service.updateUserById({ _id, data: data_to_update });
 
-    if (!updated_staff) {
+    if (!updated_user) {
       return response.responseErrorMessage(res, 500, {
         error: "Server error occurred! please try again",
       });
     }
 
-    const { data_except_password } = document_extractor.extractStaffDocument({
-      staff: updated_staff,
+    const { data_except_password } = document_extractor.extractUserDocument({
+      user: updated_user,
     });
 
     const { access_token, refresh_token } =
-      await staff_service.createStaffAuthTokenTokens({
-        staff: updated_staff,
+      await user_service.createUserAuthTokens({
+        user: updated_user,
       });
 
-    // clear staffs from cache
-    await redis_service.clearKeys({ key: "staffs" });
+    // clear users from cache
+    await redis_service.clearKeys({ key: "users" });
 
-    // save staff in cache: 3600 * 24 * 2 - for 2 days
+    // save user in cache: 3600 * 24 * 2 - for 2 days
     const cache_key: string = create_cache_key.createKeyForDocument({
-      key: "staff",
+      key: "user",
       value: data_except_password._id.toString(),
     });
 
@@ -186,10 +186,10 @@ export const putUpdateStaffById: RequestHandler = async (req, res, next) => {
       code: 200,
       message: "Information updated successfully",
       access_token,
-      staff: data_except_password,
+      user: data_except_password,
       links: {
-        self: `/staffs/s/${data_except_password._id}`,
-        profile: `/staffs/s/${data_except_password._id}/profile`,
+        self: `/users/u/${data_except_password._id}`,
+        profile: `/users/u/${data_except_password._id}/profile`,
       },
     });
   } catch (e) {
