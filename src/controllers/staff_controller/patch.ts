@@ -309,6 +309,12 @@ export const patchUpdateStaffRoleById: RequestHandler = async (
       });
     }
 
+    if (staff.role === value.role) {
+      return response.responseErrorMessage(res, 409, {
+        error: `Role is already: ${value.role}`,
+      });
+    }
+
     const updated_staff: staff_type.THydratedStaffDocument | null =
       await staff_service.updateStaffRoleById({ _id, role: value.role });
 
