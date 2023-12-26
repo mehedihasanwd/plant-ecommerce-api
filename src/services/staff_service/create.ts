@@ -14,7 +14,7 @@ export const createNewStaff = async ({
   return new_staff.save();
 };
 
-export const createStaffAuthTokenTokens = async ({
+export const createStaffAuthTokens = async ({
   staff,
 }: staff_type.ICreateStaffAuthTokens): Promise<staff_type.IStaffAuthTokens> => {
   const access_token_payload: payload_type.IStaffPayload = {
