@@ -38,6 +38,7 @@ export const forgot_password_validate_schema: joi.ObjectSchema<staff_type.IPostF
 export const reset_password_validate_schema: joi.ObjectSchema<staff_type.IPatchResetStaffPassword> =
   joi.object({
     token: common_validator_schema.token_schema,
+    new_password: common_validator_schema.new_password_schema,
   });
 
 export const change_password_validate_schema: joi.ObjectSchema<staff_type.IPatchChangeStaffPassword> =
