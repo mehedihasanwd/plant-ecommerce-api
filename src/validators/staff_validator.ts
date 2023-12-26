@@ -5,7 +5,7 @@ import * as common_validator_schema from "./common_validator_schema";
 const role_schema: joi.StringSchema<string> =
   common_validator_schema.string_schema
     .required()
-    .valid("man", "woman", "select")
+    .valid("admin", "editor", "guest")
     .messages({
       "string.base": "Role should be a string!",
       "string.empty": "Role is required!",
