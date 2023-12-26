@@ -70,7 +70,7 @@ export const patchResetStaffPassword: RequestHandler = async (
         }
 
         const { access_token, refresh_token } =
-          await staff_service.createStaffAuthTokenTokens({
+          await staff_service.createStaffAuthTokens({
             staff: updated_staff,
           });
 
@@ -235,9 +235,9 @@ export const patchUpdateStaffEmail: RequestHandler = async (req, res, next) => {
           });
         }
 
-        const { access_token } = await staff_service.createStaffAuthTokenTokens(
-          { staff: updated_staff }
-        );
+        const { access_token } = await staff_service.createStaffAuthTokens({
+          staff: updated_staff,
+        });
 
         const { data_except_password } =
           document_extractor.extractStaffDocument({ staff: updated_staff });
