@@ -198,7 +198,7 @@ export const post_logout_staff = {
     [props.description]: "Logout",
     [props.tags]: [tags.staff_auth],
     [props.security]: [security.bearerAuth],
-    [props.requestBody]: use_request.bodyEmail,
+    [props.requestBody]: use_request.bodyEmail(),
     [props.responses]: {
       "400": use_response.sendEmailRequired(),
 
