@@ -164,9 +164,9 @@ export const getNewAccessToken: RequestHandler = async (req, res, next) => {
           });
         }
 
-        const { access_token } = await staff_service.createStaffAuthTokenTokens(
-          { staff }
-        );
+        const { access_token } = await staff_service.createStaffAuthTokens({
+          staff,
+        });
 
         return response.responseSuccessData(res, 200, {
           code: 200,
