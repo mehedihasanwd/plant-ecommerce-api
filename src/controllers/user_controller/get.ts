@@ -197,3 +197,59 @@ export const getUsers: RequestHandler = async (req, res, next) => {
     return next(e);
   }
 };
+
+export const getNewAccessToken: RequestHandler = async (req, res, next) => {
+  const refresh_token = req.cookies?.refresh_token as string;
+
+  if (!refresh_token) {
+    return response.responseErrorMessage(res, 401, { error: "Unautorized!" });
+  }
+
+  try {
+    jwt.verify(
+      refresh_token,
+      dotenvconfig.JWT_REFRESH,
+      async (
+        err: jwt.VerifyErrors | null,
+        decoded: jwt.JwtPayload | string | undefined
+      ) => {
+        if (err) {
+          return response.responseErrorMessage(res, 401, {
+            error:
+              "Invalid token or expired! please try again using a valid one",
+          });
+        }
+
+        const payload = decoded as common_type.IObjectId;
+
+        const user: user_type.THydratedUserDocument | null =
+          await user_service.findUserByProp({
+            key: "_id",
+            value: payload._id.toString(),
+          });
+
+        if (!user) {
+          return response.responseErrorMessage(res, 404, {
+            error: "User not found!",
+          });
+        }
+
+        const { access_token } = await user_service.createUserAuthTokens({
+          user,
+        });
+
+        return response.responseSuccessData(res, 200, {
+          code: 200,
+
+          access_token,
+
+          links: {
+            self: "/auth/users/access-token",
+          },
+        });
+      }
+    );
+  } catch (e) {
+    return next(e);
+  }
+};
