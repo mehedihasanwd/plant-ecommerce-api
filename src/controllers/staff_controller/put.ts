@@ -113,7 +113,7 @@ export const putUpdateStaffById: RequestHandler = async (req, res, next) => {
       });
 
       const { access_token, refresh_token } =
-        await staff_service.createStaffAuthTokenTokens({
+        await staff_service.createStaffAuthTokens({
           staff: updated_staff,
         });
 
@@ -163,7 +163,7 @@ export const putUpdateStaffById: RequestHandler = async (req, res, next) => {
     });
 
     const { access_token, refresh_token } =
-      await staff_service.createStaffAuthTokenTokens({
+      await staff_service.createStaffAuthTokens({
         staff: updated_staff,
       });
 
