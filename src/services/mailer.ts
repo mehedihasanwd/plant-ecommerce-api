@@ -28,7 +28,7 @@ export const sendEmail = (
         error: `Something went wrong while verifying email: ${err.message}`,
       });
     } else {
-      console.log("Server is ready to take our email (mailter.ts)");
+      console.log("Server is ready to take our email (mailer.ts)");
     }
   });
 
@@ -60,7 +60,7 @@ export const sendEmailToSuperAdmin = (
   transporter.sendMail(body, (err: Error | null) => {
     if (err) {
       console.log(
-        `(mailter.ts): Something went wrong while sending email: ${err.message}`
+        `(mailer.ts): Something went wrong while sending email: ${err.message}`
       );
     }
   });
