@@ -46,7 +46,7 @@ export const updateStaffPassword = async ({
   new_password,
 }: staff_type.IUpdateStaffPassword): Promise<staff_type.THydratedStaffDocument | null> => {
   staff.password = new_password;
-  return staff.save();
+  return staff.save({ validateModifiedOnly: true });
 };
 
 export const updateStaffEmail = async ({
@@ -54,5 +54,6 @@ export const updateStaffEmail = async ({
   new_email,
 }: staff_type.IUpdateStaffEmail): Promise<staff_type.THydratedStaffDocument | null> => {
   staff.email = new_email;
-  return staff.save();
+
+  return staff.save({ validateModifiedOnly: true });
 };
