@@ -246,13 +246,13 @@ export interface IChangePassword extends IEmail, IPassword, INewPassword {}
 export interface IUpdateEmail extends IToken {}
 
 export interface IUpdateAccount extends IName {
-  gender?: TGender;
-  phone?: string;
-  country?: string;
-  city?: string;
-  house_number_or_name?: string;
-  post_code?: number;
-  image?: IProfileImageProps;
+  gender: TGender;
+  phone: string;
+  country: string;
+  city: string;
+  house_number_or_name: string;
+  post_code: number;
+  image: IProfileImageProps;
 }
 
 export interface IAccessToken {
