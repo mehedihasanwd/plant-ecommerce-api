@@ -29,6 +29,7 @@ export const bodyToken = () => {
         [props.schema]: {
           ...prop_type.object_type,
           [props.properties]: {
+            email: request.email,
             token: request.token,
           },
           [props.required]: ["token"],
