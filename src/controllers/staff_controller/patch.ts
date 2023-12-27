@@ -224,6 +224,19 @@ export const patchUpdateStaffEmail: RequestHandler = async (req, res, next) => {
           });
         }
 
+        const is_staff_exists: staff_type.THydratedStaffDocument | null =
+          await staff_service.findStaffByProp({
+            key: "email",
+            value: decoded_token.new_email,
+          });
+
+        if (is_staff_exists) {
+          return response.responseErrorMessage(res, 409, {
+            error:
+              "Account already exists with the new email! please try again using another one",
+          });
+        }
+
         const updated_staff: staff_type.THydratedStaffDocument | null =
           await staff_service.updateStaffEmail({
             staff,
