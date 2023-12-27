@@ -18,7 +18,7 @@ export const updateUserById = async ({
 
   if (!updated_user) return null;
 
-  return updated_user.save();
+  return updated_user.save({ validateModifiedOnly: true });
 };
 
 export const updateUserPassword = async ({
@@ -26,7 +26,7 @@ export const updateUserPassword = async ({
   new_password,
 }: user_type.IUpdateUserPassword): Promise<user_type.THydratedUserDocument | null> => {
   user.password = new_password;
-  return user.save();
+  return user.save({ validateModifiedOnly: true });
 };
 
 export const updateUserEmail = async ({
@@ -34,5 +34,5 @@ export const updateUserEmail = async ({
   new_email,
 }: user_type.IUpdateUserEmail): Promise<user_type.THydratedUserDocument | null> => {
   user.email = new_email;
-  return user.save();
+  return user.save({ validateModifiedOnly: true });
 };
