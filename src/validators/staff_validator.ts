@@ -67,10 +67,11 @@ export const update_staff_role_validate_schema: joi.ObjectSchema<staff_type.IPat
 export const update_staff_by_id: joi.ObjectSchema<staff_type.IPutUpdateStaff> =
   joi.object({
     name: common_validator_schema.name_schema,
-    gender: common_validator_schema.gender_schema,
-    phone: common_validator_schema.phone_schema,
-    country: common_validator_schema.country_schema,
-    city: common_validator_schema.city_schema,
-    house_number_or_name: common_validator_schema.house_number_or_name_schema,
-    post_code: common_validator_schema.post_code_schema,
+    gender: common_validator_schema.gender_schema.allow(""),
+    phone: common_validator_schema.phone_schema.allow(""),
+    country: common_validator_schema.country_schema.allow(""),
+    city: common_validator_schema.city_schema.allow(""),
+    house_number_or_name:
+      common_validator_schema.house_number_or_name_schema.allow(""),
+    post_code: common_validator_schema.post_code_schema.allow(""),
   });
