@@ -18,7 +18,7 @@ export const updateStaffById = async ({
 
   if (!updated_staff) return null;
 
-  return updated_staff.save();
+  return updated_staff.save({ validateModifiedOnly: true });
 };
 
 export const updateStaffRoleById = async ({
@@ -38,7 +38,7 @@ export const updateStaffRoleById = async ({
 
   if (!updated_staff) return null;
 
-  return updated_staff.save();
+  return updated_staff.save({ validateModifiedOnly: true });
 };
 
 export const updateStaffPassword = async ({
