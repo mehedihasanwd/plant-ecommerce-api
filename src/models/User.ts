@@ -54,6 +54,7 @@ const user_schema = new mongoose.Schema<
       type: String,
       trim: true,
       minlength: 5,
+      default: "your phone number",
     },
 
     image: {
