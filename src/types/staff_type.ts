@@ -45,7 +45,7 @@ export interface IPostRegisterStaff extends common_type.IRegister {}
 
 export interface IPostLoginStaff extends common_type.ILogin {}
 
-export interface IPutUpdateStaff extends common_type.IUpdateAccount {}
+export interface IPutUpdateStaff extends common_type.IPutAccount {}
 
 export interface IPostForgotStaffPassword extends common_type.IForgotPassword {}
 
