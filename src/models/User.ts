@@ -37,7 +37,7 @@ const user_schema = new mongoose.Schema<
       required: [true, "Password is required"],
       validate: {
         validator: function (v: string) {
-          return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+          return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(
             v
           );
         },
