@@ -255,6 +255,16 @@ export interface IUpdateAccount extends IName {
   image: IProfileImageProps;
 }
 
+export interface IPutAccount extends IName {
+  gender?: TGender;
+  phone?: string;
+  country?: string;
+  city?: string;
+  house_number_or_name?: string;
+  post_code?: number;
+  image?: IProfileImageProps;
+}
+
 export interface IAccessToken {
   access_token: string;
 }
