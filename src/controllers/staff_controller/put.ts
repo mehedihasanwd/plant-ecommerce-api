@@ -57,18 +57,17 @@ export const putUpdateStaffById: RequestHandler = async (req, res, next) => {
 
       name: value.name,
 
-      gender: value?.gender || staff.gender,
+      gender: value.gender,
 
-      phone: value?.phone || staff.phone,
+      phone: value.phone,
 
-      country: value?.country || staff.country,
+      country: value.country,
 
-      city: value?.city || staff.city,
+      city: value.city,
 
-      house_number_or_name:
-        value?.house_number_or_name || staff?.house_number_or_name,
+      house_number_or_name: value.house_number_or_name,
 
-      post_code: value?.post_code || staff.post_code,
+      post_code: value.post_code,
     };
 
     if (image) {
