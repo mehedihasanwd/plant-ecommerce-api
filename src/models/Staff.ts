@@ -54,7 +54,7 @@ const staff_schema = new mongoose.Schema<
       type: String,
       trim: true,
       minlength: 5,
-      default: "",
+      default: "your phone number",
     },
 
     image: {
