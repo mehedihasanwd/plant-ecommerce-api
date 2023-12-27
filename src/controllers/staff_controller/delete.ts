@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { staff_service, redis_service } from "../../services";
+import { staff_service, redis_service, aws_s3 } from "../../services";
 import { response, isValidParamId, create_cache_key } from "../../utils";
 import { staff_type } from "../../types";
 
@@ -26,6 +26,10 @@ export const deleteStaffById: RequestHandler = async (req, res, next) => {
       key: "staff",
       value: staff._id.toString(),
     });
+
+    if (staff.image.isChangedSelf) {
+      await aws_s3.removeImageFromS3({ key: staff.image.key });
+    }
 
     await redis_service.clearKeys({ key: "staffs" });
     await redis_service.removeFromCache({
