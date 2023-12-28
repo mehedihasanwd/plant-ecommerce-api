@@ -33,7 +33,8 @@ export const postVerifyEmail: RequestHandler = async (req, res, next) => {
 
     if (staff) {
       return response.responseErrorMessage(res, 409, {
-        error: "E-mail already exists! please try again using a new one",
+        error:
+          "Account already exists with this email! please try again using a new one",
       });
     }
 
