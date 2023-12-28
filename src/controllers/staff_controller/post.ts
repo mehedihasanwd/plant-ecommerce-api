@@ -328,6 +328,19 @@ export const postVerifyStaffEmail: RequestHandler = async (req, res, next) => {
       });
     }
 
+    const is_staff_exists: staff_type.THydratedStaffDocument | null =
+      await staff_service.findStaffByProp({
+        key: "email",
+        value: value.new_email,
+      });
+
+    if (is_staff_exists) {
+      return response.responseErrorMessage(res, 409, {
+        error:
+          "Account already exists with new email! please try again using another one",
+      });
+    }
+
     const access_token: string = token.updateAccountEmailToken({
       payload: {
         email: value.email,
