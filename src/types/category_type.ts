@@ -39,8 +39,8 @@ export interface IPutCategory extends IPostNewCategory {}
 interface ICategoryDataProps extends IPostNewCategory, common_type.IImage {}
 
 export interface IFindCategoryByProp {
-  key: "_id" | "name";
-  value: common_type.IObjectIdOrString;
+  key: "_id" | "name" | "slug";
+  value: string | mongoose.Types.ObjectId;
 }
 
 export interface IFindCategories
