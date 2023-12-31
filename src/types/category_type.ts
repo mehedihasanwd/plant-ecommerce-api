@@ -49,6 +49,12 @@ export interface IFindCategories
   sort_type: "asc" | "dsc" | "active" | "inactive";
 }
 
+export interface IFindCategoriesByStatus
+  extends common_type.ISkipLimit,
+    common_type.ISortType,
+    common_type.ISearchBy,
+    common_type.IStatus {}
+
 export interface ICreateNewCategory {
   data: ICategoryDataProps;
 }
