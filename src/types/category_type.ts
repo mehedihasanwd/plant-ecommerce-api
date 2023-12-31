@@ -45,8 +45,9 @@ export interface IFindCategoryByProp {
 
 export interface IFindCategories
   extends common_type.ISkipLimit,
-    common_type.ISortType,
-    common_type.ISearchBy {}
+    common_type.ISearchBy {
+  sort_type: "asc" | "dsc" | "active" | "inactive";
+}
 
 export interface ICreateNewCategory {
   data: ICategoryDataProps;
