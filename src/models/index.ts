@@ -1,4 +1,5 @@
 import { Staff } from "./Staff";
 import { User } from "./User";
+import { Category } from "./Category";
 
-export { Staff, User };
+export { Staff, User, Category };
