@@ -36,7 +36,10 @@ export interface IPatchCategoryStatus extends common_type.IStatus {}
 export interface IPutCategory extends IPostNewCategory {}
 
 // category service type
-interface ICategoryDataProps extends IPostNewCategory, common_type.IImage {}
+interface ICategoryDataProps
+  extends IPostNewCategory,
+    common_type.IImage,
+    common_type.ISlug {}
 
 export interface IFindCategoryByProp {
   key: "_id" | "name" | "slug";
