@@ -7,6 +7,7 @@ import * as document_extractor from "./document_extractor";
 import * as create_cache_key from "./create_cache_key";
 import { isValidParamId } from "./param_id_validator";
 import * as pagination from "./pagination";
+import * as cache_expiration from "./cache_expiration";
 
 export {
   response,
@@ -18,4 +19,5 @@ export {
   create_cache_key,
   isValidParamId,
   pagination,
+  cache_expiration,
 };
