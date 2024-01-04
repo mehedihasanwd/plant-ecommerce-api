@@ -236,7 +236,7 @@ export const findCategories = async ({
   return categories;
 };
 
-export const findCategoryByStatus = async ({
+export const findCategoriesByStatus = async ({
   skip,
   limit,
   sort_type,
