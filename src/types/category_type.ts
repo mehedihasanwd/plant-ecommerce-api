@@ -3,7 +3,7 @@ import * as common_type from "./common_type";
 
 // category schema and model type
 interface ICategoryName {
-  name: common_type.ICategory;
+  name: common_type.TCategory;
 }
 
 export interface ICategorySchema
