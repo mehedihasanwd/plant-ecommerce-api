@@ -1,6 +1,11 @@
 import { RequestHandler } from "express";
 import { category_service, redis_service, aws_s3 } from "../../services";
-import { response, create_cache_key, errorReducer } from "../../utils";
+import {
+  response,
+  create_cache_key,
+  errorReducer,
+  string_converter,
+} from "../../utils";
 import { category_validator } from "../../validators";
 import { common_type, category_type } from "../../types";
 
@@ -53,6 +58,7 @@ export const postNewCategory: RequestHandler = async (req, res, next) => {
       await category_service.createNewCategory({
         data: {
           name: value.name,
+          slug: string_converter.convertStringToUrl(value.name),
           description: value.description,
           image: {
             key: cloud_image.Key,
