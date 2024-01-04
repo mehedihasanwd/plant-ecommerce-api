@@ -6,10 +6,13 @@ import { common_type, category_type } from "../../types";
 
 export const postNewCategory: RequestHandler = async (req, res, next) => {
   const { value, error } =
-    category_validator.post_new_category_validate_schema.validate({
-      name: req.body?.name,
-      description: req.body?.description,
-    });
+    category_validator.post_new_category_validate_schema.validate(
+      {
+        name: req.body?.name,
+        description: req.body?.description,
+      },
+      { abortEarly: false }
+    );
 
   const image = req.files?.image as common_type.TUploadedFile;
 
