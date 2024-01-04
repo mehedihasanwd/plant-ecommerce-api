@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { redis_service, category_service } from ".././../services";
+import { redis_service, category_service, aws_s3 } from ".././../services";
 import {
   create_cache_key,
   isValidParamId,
@@ -36,6 +36,8 @@ export const deleteCategoryById: RequestHandler = async (req, res, next) => {
     await redis_service.removeFromCache({
       key: [collection_keys.categories, cache_key],
     });
+
+    await aws_s3.removeImageFromS3({ key: category.image.key });
 
     await category_service.removeCategoryById({ _id });
 
