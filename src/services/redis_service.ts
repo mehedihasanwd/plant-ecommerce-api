@@ -73,9 +73,3 @@ export const clearKeys = async ({
 
   return await removeFromCache({ key: matched_keys });
 };
-
-export const setCacheExpiration = ({ day }: { day: number }): number => {
-  const EX: number = 3600 * 24 * day;
-
-  return EX;
-};
