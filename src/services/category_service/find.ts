@@ -1,4 +1,4 @@
-import { category_type } from "../../types";
+import { category_type, common_type } from "../../types";
 import { Category } from "../../models";
 
 export const findCategoryByProp = async ({
@@ -407,4 +407,16 @@ export const findCategoryByStatus = async ({
   if (!categories || categories.length < 1) return null;
 
   return categories;
+};
+
+export const countCategories = async ({
+  search_by,
+}: common_type.ISearchBy): Promise<number> => {
+  const filter = search_by
+    ? {
+        name: { $regex: search_by, $options: "i" },
+      }
+    : {};
+
+  return Category.countDocuments(filter);
 };
