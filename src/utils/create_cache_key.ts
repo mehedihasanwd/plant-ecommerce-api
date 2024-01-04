@@ -16,7 +16,7 @@ interface ICreateKeyForCollection {
     | "staffs"
     | "users"
     | "products"
-    | "categorys"
+    | "categories"
     | "coupons"
     | "orders"
     | "reviews";
