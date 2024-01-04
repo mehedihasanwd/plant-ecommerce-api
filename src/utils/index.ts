@@ -9,6 +9,7 @@ import { isValidParamId } from "./param_id_validator";
 import * as pagination from "./pagination";
 import * as cache_expiration from "./cache_expiration";
 import collection_keys from "./collection_keys";
+import * as string_converter from "./string_converter";
 
 export {
   response,
@@ -22,4 +23,5 @@ export {
   pagination,
   cache_expiration,
   collection_keys,
+  string_converter,
 };
