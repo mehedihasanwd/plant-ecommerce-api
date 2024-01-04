@@ -8,6 +8,7 @@ import * as create_cache_key from "./create_cache_key";
 import { isValidParamId } from "./param_id_validator";
 import * as pagination from "./pagination";
 import * as cache_expiration from "./cache_expiration";
+import collection_keys from "./collection_keys";
 
 export {
   response,
@@ -20,4 +21,5 @@ export {
   isValidParamId,
   pagination,
   cache_expiration,
+  collection_keys,
 };
