@@ -5,9 +5,9 @@ import * as put from "./put";
 import * as remove from "./delete";
 
 export default {
-  get,
-  post,
-  patch,
-  put,
-  remove,
+  ...get,
+  ...post,
+  ...patch,
+  ...put,
+  ...remove,
 };
