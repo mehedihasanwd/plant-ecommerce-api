@@ -113,3 +113,12 @@ export const status_schema: joi.StringSchema<string> = string_schema
     "string.empty": "Status is required!",
     "any.only": "Status should be either: 'active' or 'inactive'",
   });
+
+export const description: joi.StringSchema<string> = string_schema
+  .required()
+  .min(50)
+  .messages({
+    "string.base": "Description should be a string!",
+    "string.empty": "Description is required!",
+    "string.min": "Description should contain at least 50 characters",
+  });
