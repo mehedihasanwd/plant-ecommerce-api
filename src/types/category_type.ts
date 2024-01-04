@@ -70,6 +70,6 @@ export interface IUpdateCategoryById extends common_type.IObjectIdOrString {
   data: {
     name: ICategoryName;
     description: common_type.IDescription;
-    image?: common_type.IImage;
+    image?: common_type.ImageProps;
   };
 }
