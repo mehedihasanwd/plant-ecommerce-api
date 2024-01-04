@@ -104,3 +104,12 @@ export const token_schema: joi.StringSchema<string> = string_schema
     "string.base": "Token should be a string!",
     "string.empty": "Token is required!",
   });
+
+export const status_schema: joi.StringSchema<string> = string_schema
+  .required()
+  .valid("active", "inactive")
+  .messages({
+    "string.base": "Status should be a string!",
+    "string.empty": "Status is required!",
+    "any.only": "Status should be either: 'active' or 'inactive'",
+  });
